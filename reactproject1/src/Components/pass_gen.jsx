@@ -1,6 +1,6 @@
 import '../index.css'
 import { useState } from 'react'
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 
 
@@ -9,18 +9,37 @@ function Pass() {
     const [numAllowed, setNumAllowed] = useState(false);
     const [charAllowed, SetCharAllowed] = useState(false);
     const [Password, setPassword] = useState("");
+    // use ref hooh
+    const passwordRef = useRef(null)
 
+     
     const PasswordGen = useCallback(() => {
-        let pass = ''
-        let str = 'qwertyuiopasdfghjjkklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM'
-        if (numAllowed) str += '1234567890';
-        if (charAllowed) str += '!@#$%^&*(){}[]<>?'
+        let pass = ""
+        let str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+        if (numAllowed) str += "0123456789"
+        if (charAllowed) str += "!@#$%^&*-_+=[]{}~`"
+
         for (let i = 1; i <= length; i++) {
-            let char = Math.floor(Math.random * length + 1);
+            let char = Math.floor(Math.random() * str.length + 1)
             pass += str.charAt(char)
+
         }
+        setPassword(pass);
     },
-   [length, numAllowed, charAllowed, setPassword]);
+        [length, numAllowed, charAllowed, setPassword]);
+
+    const cpPass = useCallback(() => {
+        passwordRef.current?.select()
+        window.navigator.clipboard.writeText(Password)
+    }, [Password])
+
+    
+
+    useEffect(() => {
+        PasswordGen();
+    }, [length, numAllowed, charAllowed, PasswordGen])
+
+  
 
     return (
         <>
@@ -28,12 +47,14 @@ function Pass() {
             <div className=" w-full max-w-md mx-auto shadow-md rounded-lg px-4 text-orange-500 my-8
                 shadow-md bg-gray">
                 <div className="flex shadow rounded-lg overflow-hidden mb-4">
-                    <input value={Pass}
+                    <input value={Password}
                         type='text'
                         className='outline-none w-full py-1 px-3'
                         placeholder="password"
-                        readOnly></input>
-                    <button className="bg-blue-700 mx-3 rounded-lg pd-1">
+                        readOnly
+                        ref={passwordRef}>
+                    </input>
+                    <button className="bg-blue-700 mx-2 rounded-lg pd-3" onClick={cpPass }>
                         copy
                     </button>
                 </div>
